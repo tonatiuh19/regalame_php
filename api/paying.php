@@ -26,6 +26,7 @@ if ($method == 'POST') {
         $note_fan = $params['note_fan'];
         $isPublic_note_fan = $params['isPublic_note_fan'];
         $user_name = $params['user_name'];
+        $payment_type = $params['payment_type'];
 
         $token = $params['token'];
 
@@ -37,15 +38,20 @@ if ($method == 'POST') {
 
         try {
 
-            $charge = $stripe->charges->create([
-                'amount' => $amount * 100,
-                'currency' => 'mxn',
-                'source' => $token
-            ]);
-            $chargeId = $charge["id"];
+            if ($payment_type === 'stripe') {
+                $charge = $stripe->charges->create([
+                    'amount' => $amount * 100,
+                    'currency' => 'mxn',
+                    'source' => $token
+                ]);
+                $chargeId = $charge["id"];
+            } else {
+                $chargeId = $token;
+            }
+
 
             // Insert into BOOKING table
-            $insertExtraPayment = "INSERT INTO payments(id_user, id_extra, email_user, id_stripe, type, status, date, amount, amount_fee, amount_tax, description, question_answer, payment_name, note_fan, isPublic_note_fan) VALUES ('$id_user','$id_extra','$email_user','$chargeId','stripe','Paid','$todayVisit','$amount','','','$description','$question_answer','$payment_name','$note_fan','$isPublic_note_fan')";
+            $insertExtraPayment = "INSERT INTO payments(id_user, id_extra, email_user, id_stripe, type, status, date, amount, amount_fee, amount_tax, description, question_answer, payment_name, note_fan, isPublic_note_fan) VALUES ('$id_user','$id_extra','$email_user','$chargeId','$payment_type','Paid','$todayVisit','$amount','','','$description','$question_answer','$payment_name','$note_fan','$isPublic_note_fan')";
 
             if ($conn->query($insertExtraPayment) === TRUE) {
                 $paymentID = $conn->insert_id;

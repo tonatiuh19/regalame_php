@@ -56,6 +56,21 @@ WHERE a.id_user=$idUser";
             }
             $user['categories'] = $categories;
 
+            // Fetch the payment information for the user
+            $paymentQuery = "SELECT a.id_users_payment, a.id_users_payment_type, a.value, a.place, b.title 
+FROM users_payment as a 
+INNER JOIN users_payment_types as b on b.id_users_payment_types=a.id_users_payment_type 
+WHERE a.id_user=$idUser";
+
+            $paymentResult = $conn->query($paymentQuery);
+            $payments = [];
+            if ($paymentResult->num_rows > 0) {
+                while ($row = $paymentResult->fetch_assoc()) {
+                    $payments[] = $row;
+                }
+            }
+            $user['paymentsTypes'] = $payments;
+
             $res = json_encode(utf8_encode_recursive($user), JSON_NUMERIC_CHECK);
             header('Content-type: application/json; charset=utf-8');
             echo $res;
@@ -88,6 +103,16 @@ WHERE a.id_user = $newUserId";
                             }
                         }
                         $newUser['categories'] = $categories;
+
+                        // Fetch the payment information for the new user
+                        $paymentResult = $conn->query($paymentQuery);
+                        $payments = [];
+                        if ($paymentResult->num_rows > 0) {
+                            while ($row = $paymentResult->fetch_assoc()) {
+                                $payments[] = $row;
+                            }
+                        }
+                        $newUser['paymentsTypes'] = $payments;
 
                         $res = json_encode(utf8_encode_recursive($newUser), JSON_NUMERIC_CHECK);
                         header('Content-type: application/json; charset=utf-8');
