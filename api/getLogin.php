@@ -2,8 +2,10 @@
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token');
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+
 require "./phpmailer/phpmailer/src/Exception.php";
 require "./phpmailer/phpmailer/src/PHPMailer.php";
 require "./phpmailer/phpmailer/src/SMTP.php";
@@ -99,6 +101,9 @@ WHERE a.id_user = $newUserId";
                     if ($newUserResult->num_rows > 0) {
                         $newUser = $newUserResult->fetch_assoc();
 
+                        $categoriesQuery = "SELECT a.id_users_categories, a.id_categories, a.id_user 
+FROM users_categories as a 
+WHERE a.id_user=$newUserId";
                         // Fetch the categories for the new user
                         $categoriesResult = $conn->query($categoriesQuery);
                         $categories = [];
@@ -109,6 +114,10 @@ WHERE a.id_user = $newUserId";
                         }
                         $newUser['categories'] = $categories;
 
+                        $paymentQuery = "SELECT a.id_users_payment, a.id_users_payment_type, a.value, a.place, b.title 
+FROM users_payment as a 
+INNER JOIN users_payment_types as b on b.id_users_payment_types=a.id_users_payment_type 
+WHERE a.id_user=$newUserId";
                         // Fetch the payment information for the new user
                         $paymentResult = $conn->query($paymentQuery);
                         $payments = [];
@@ -145,7 +154,19 @@ function sendMailWelcome($email, $uname)
     $mail = new PHPMailer(true);
 
     try {
-        require_once "./serversettingsPhpmailer.php";
+        $mail->SMTPDebug = 2;                                     // Enable verbose debug output
+        // $mail->isSMTP();                                            // Set mailer to use SMTP
+        $mail->Host       = 'mail.regalameuncafe.com';  // Specify main and backup SMTP servers
+        $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
+        $mail->Username   = 'no-reply@regalameuncafe.com';                     // SMTP username
+        $mail->Password   = 'Mailer123';                               // SMTP password
+        $mail->SMTPSecure = 'ssl';                                  // Enable TLS encryption, `ssl` also accepted
+        $mail->Port       = 469;                                   // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
+        $mail->CharSet = 'UTF-8';
+        //Recipients
+        $mail->setFrom('no-reply@regalameuncafe.com', 'Regalame un Cafe | Asistente');
+        //$mail->addAddress('ellen@example.com');               // Name is optional
+        $mail->addReplyTo('ayuda@regalameuncafe.com', 'Asistente');
         $mail->setLanguage(
             "es",
             "./phpmailer/phpmailer/language"
@@ -163,7 +184,6 @@ function sendMailWelcome($email, $uname)
             "Bienvenidx " .
             $uname .
             ", <p>Te damos un reconocimiento por darle a tu audiencia lo que se merece y necesita.</p> <br>Equipo Regalameuncafe.<br>ayuda@regalameuncafe.com";
-        $mail->CharSet = 'UTF-8';
         $mail->send();
         return true;
     } catch (Exception $e) {
@@ -174,4 +194,3 @@ function sendMailWelcome($email, $uname)
 }
 
 $conn->close();
-?>

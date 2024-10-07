@@ -1,0 +1,6 @@
+[06-Oct-2024 20:43:09 America/Mexico_City] PHP Warning:  require_once(./serversettingsPhpmailer.php): Failed to open stream: No such file or directory in /home3/alanchat/garbrix.com/regalame/api/paying.php on line 147
+[06-Oct-2024 20:43:09 America/Mexico_City] PHP Fatal error:  Uncaught Error: Failed opening required './serversettingsPhpmailer.php' (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home3/alanchat/garbrix.com/regalame/api/paying.php:147
+Stack trace:
+#0 /home3/alanchat/garbrix.com/regalame/api/paying.php(69): sendMailHostCoffee('tonatiuh.gom@gm...')
+#1 {main}
+  thrown in /home3/alanchat/garbrix.com/regalame/api/paying.php on line 147

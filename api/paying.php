@@ -2,8 +2,10 @@
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token');
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+
 require "./phpmailer/phpmailer/src/Exception.php";
 require "./phpmailer/phpmailer/src/PHPMailer.php";
 require "./phpmailer/phpmailer/src/SMTP.php";
@@ -63,22 +65,19 @@ if ($method == 'POST') {
                     $emailRow = $emailResult->fetch_assoc();
                     $userEmail = $emailRow['email'];
 
-                    if (sendMailGracias($email_user, $user_name, $note_fan, $amount, '')) {
-                        sendMailHostCoffee($userEmail);
-                    }
+                    sendMailGracias($email_user, $user_name, $note_fan, $amount, '');
+                    sendMailHostCoffee($userEmail);
+
                     echo json_encode([
                         "paymentID" => $paymentID,
                         "user_name" => $user_name,
-                        "user_email" => $userEmail,
                         "paymentSuccess" => true
                     ]);
                 } else {
                     echo json_encode([
                         "paymentID" => $paymentID,
                         "user_name" => $user_name,
-                        "user_email" => null,
-                        "paymentSuccess" => true,
-                        "message" => "User email not found"
+                        "paymentSuccess" => true
                     ]);
                 }
             } else {
@@ -102,7 +101,23 @@ function sendMailGracias($email, $uname, $message, $total, $qty)
     $today = date("Y-m-d H:i:s");
 
     try {
-        require_once "./serversettingsPhpmailer.php";
+        $mail->SMTPDebug = 2;                                     // Enable verbose debug output
+        // $mail->isSMTP();                                            // Set mailer to use SMTP
+        $mail->Host       = 'mail.regalameuncafe.com';  // Specify main and backup SMTP servers
+        $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
+        $mail->Username   = 'no-reply@regalameuncafe.com';                     // SMTP username
+        $mail->Password   = 'Mailer123';                               // SMTP password
+        $mail->SMTPSecure = 'ssl';                                  // Enable TLS encryption, `ssl` also accepted
+        $mail->Port       = 469;                                   // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
+        $mail->CharSet = 'UTF-8';
+        //Recipients
+        $mail->setFrom('no-reply@regalameuncafe.com', 'Regalame un Cafe | Asistente');
+        //$mail->addAddress('ellen@example.com');               // Name is optional
+        $mail->addReplyTo('ayuda@regalameuncafe.com', 'Asistente');
+        $mail->setLanguage(
+            "es",
+            "./phpmailer/phpmailer/language"
+        );
         $mail->addAddress($email, "Fan destacado"); // Add a recipient
         // Content
         $mail->isHTML(true); // Set email format to HTML
@@ -126,7 +141,23 @@ function sendMailHostCoffee($email)
     $mail = new PHPMailer(true);
 
     try {
-        require_once "./serversettingsPhpmailer.php";
+        $mail->SMTPDebug = 2;                                     // Enable verbose debug output
+        // $mail->isSMTP();                                            // Set mailer to use SMTP
+        $mail->Host       = 'mail.regalameuncafe.com';  // Specify main and backup SMTP servers
+        $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
+        $mail->Username   = 'no-reply@regalameuncafe.com';                     // SMTP username
+        $mail->Password   = 'Mailer123';                               // SMTP password
+        $mail->SMTPSecure = 'ssl';                                  // Enable TLS encryption, `ssl` also accepted
+        $mail->Port       = 469;                                   // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
+        $mail->CharSet = 'UTF-8';
+        //Recipients
+        $mail->setFrom('no-reply@regalameuncafe.com', 'Regalame un Cafe | Asistente');
+        //$mail->addAddress('ellen@example.com');               // Name is optional
+        $mail->addReplyTo('ayuda@regalameuncafe.com', 'Asistente');
+        $mail->setLanguage(
+            "es",
+            "./phpmailer/phpmailer/language"
+        );
         $mail->addAddress($email); // Add a recipient
         // Content
         $mail->isHTML(true); // Set email format to HTML
