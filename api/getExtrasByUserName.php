@@ -10,7 +10,7 @@ if ($method == 'POST') {
     $requestBody = file_get_contents('php://input');
     $params = json_decode($requestBody, true);
 
-    if (isset($params['username'])) {
+    if (isset($params['username']) && !empty($params['username'])) {
         $username = $conn->real_escape_string($params['username']);
 
         $selectUserQuery = "SELECT a.id_user, a.user_name 
@@ -63,7 +63,7 @@ WHERE a.id_user=" . $userRow['id_user'];
             echo 0;
         }
     } else {
-        echo json_encode(["message" => "Not valid Body Data"], JSON_UNESCAPED_UNICODE);
+        echo 0;
     }
 } else {
     echo json_encode(["message" => "Not valid Data"], JSON_UNESCAPED_UNICODE);
