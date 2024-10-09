@@ -31,7 +31,7 @@ WHERE a.status='Paid' AND a.id_user=$id_user";
             header('Content-type: application/json; charset=utf-8');
             echo $res;
         } else {
-            echo json_encode(["message" => "No payments found"], JSON_UNESCAPED_UNICODE);
+            echo json_encode([]);
         }
     } else {
         echo json_encode(["message" => "id_user not provided"], JSON_UNESCAPED_UNICODE);
@@ -41,4 +41,3 @@ WHERE a.status='Paid' AND a.id_user=$id_user";
 }
 
 $conn->close();
-?>
